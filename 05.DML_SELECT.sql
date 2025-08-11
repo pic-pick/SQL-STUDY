@@ -180,21 +180,71 @@ WHERE BOOKPRICE >= 20000
 ORDER BY BOOKPRICE;
 
 -- 정렬 조건 2개 이상일 경우
--- 도서재고를 기준으로 내림차순정렬하고 재고가 동일한 경우 저자를 기준으로 오름차순으로 도서정보 반
+-- 도서재고를 기준으로 내림차순정렬하고 재고가 동일한 경우 저자를 기준으로 오름차순으로 도서정보 반환
 SELECT * FROM BOOK
 ORDER BY BOOKSTOCK DESC, BOOKAUTHOR ASC;
-환
+
+-------------------------------------------------------------------------------
+-- 집계 함수
+-- SUM()/AVG()/COUNT()/COUNT(*)/MAX()/MIN()
+
+-- SUM()
+-- 도서의 총 재고 수량 출력
+SELECT SUM(BOOKSTOCK) FROM BOOK;  -- 테이블반환 -> 컬럼명이 있음
+
+-- 모든 컬럼은 컬럼의 별명 생성 가능 (SELECT문에서 AS를 활용해서)
+-- 컬럼 AS "별명"
+SELECT SUN(BOOKSTOCK) AS "SUM OF BOOKSTOCK" FROM BOOK;
+
+-- 한글가능
+SELECT SUN(BOOKSTOCK) AS "총재고량" FROM BOOK;
+
+-- 2번 고객이 주문한 총 주문 도서 권수
+SELECT SUM(BSQTY) AS "총주문수량"
+FROM BOOKSALE
+-- WHERE BLIENTNO='2';
+
+-- 2번 고객이 주문한 총 주문 도서 권수와 주문 도서 번호
+-- 총 주문수량은 1개의 튜플
+-- 도서번호는 3개의 튜플
+/*SELECT BOOKNO AS "도서번호"
+FROM BOOKSALE
+WHERE BLIENTNO='2';*/
+
+SELECT SUM(BSQTY) AS "총주문수량", AVG(BSQTY) AS "평균주문수량"
+FROM BOOKSALE
+WHERE CLIENTNO='2';
 
 
 
+select sum(bookPrice) as 가격총액,
+       avg(bookPrice) as 평균가격,
+       max(bookPrice) as 최고가,
+       min(bookPrice) as 최저가
+from book;
+
+-- 도서판매 테이블에서 도서 판매 건수 조회
+-- bsDate가 null을 허용하거나 값이 중복되는 컬럼이라면 count가 원하는 목적과 같이 반환되지 않을 수도 있음
+select count(bsDate) as 총판매건수 from bookSale;
+
+-- 특정필드 값의 수가 아닌 튜플의 수를 세고자 하면 count(*)를 활용
+select count(*) as 총판매건수 from bookSale;
+
+-- 고객 테이블에서 총 취미의 개수 출력
+-- count(속성명) : 속성값이 null인 경우는 제외하고 수를 센 결과 반환
+select count(clientHobby) as "취미" from client;
+
+-- 서점의 총 고객수는 몇명인가?
+select count(*) from client;
 
 
-
-
-
-
-
-
+-- 각 도서번호별 판매수량 확인
+-- group by 진행 한 경우 select 절에 집계함수를 통해 필요열의 집계진행 가능,
+-- group by에 기준되는 열은 select에 포함시킬 수 있다
+select sum(bsqty), bookno
+from booksale
+group by bookno
+order by bookno;
 
 
 

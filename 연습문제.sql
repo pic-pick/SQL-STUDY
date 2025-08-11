@@ -100,13 +100,76 @@ SELECT CLIENTHOBBY
 9.도서 테이블에서 가격이 20,000 ~25,000원인 모든 튜플 출력
 10.도서 테이블에서 저자명에 '길동'이 들어 있지 않는 도서의 도서명, 저자 출력
 
+--------------------------------------------------------------------------------------------
+-- 1.도서 테이블에서 가격 순으로 내림차순 정렬하여,  도서명, 저자, 가격 출력 (가격이 같으면 저자 순으로 오름차순 정렬)
+SELECT bookname, bookauthor, bookprice FROM book
+ORDER BY bookprice DESC, bookauthor ASC;
+
+-- 2.도서 테이블에서 저자에 '길동'이 들어가는 도서의 총 재고 수량 계산하여 출력
+SELECT SUM(bookstock) AS 총재고수량 FROM book
+WHERE bookauthor LIKE '%길동%';
+
+-- 3.도서 테이블에서 ‘서울 출판사' 도서 중 최고가와 최저가 출력
+SELECT MAX(bookprice) AS 최고가, MIN(bookprice) AS 최저가 FROM book b
+JOIN publisher p ON b.pubno = p.pubno
+WHERE p.pubname = '서울 출판사';
+
+-- 4.도서 테이블에서 출판사별로 총 재고수량과 평균 재고 수량 계산하여 출력 (‘총 재고 수량’으로 내림차순 정렬)
+SELECT MAX(bookprice) AS 최고가, MIN(bookprice) AS 최저가 FROM book b
+JOIN publisher p ON b.pubno = p.pubno
+WHERE p.pubname = '서울 출판사';
+
+-- 5.도서판매 테이블에서 고객별로 ‘총 주문 수량’과 ‘총 주문 건수’ 출력. 단 주문 건수가 2이상인 고객만 해당
+SELECT p.pubname, SUM(b.bookstock) AS 총재고수량, AVG(b.bookstock) AS 평균재고수량
+FROM book b
+JOIN publisher p ON b.pubno = p.pubno
+GROUP BY p.pubname
+ORDER BY 총재고수량 DESC;
 
 
 
+--------------------------------------------------------------------------------
 
+-- 1) 모든 도서: 도서번호, 도서명, 출판사명
+SELECT b.bookno, b.bookname, p.pubname
+FROM book b
+JOIN publisher p ON b.pubno = p.pubno;
 
+-- 2) '서울 출판사'에서 출간한 도서: 도서명, 저자명, 출판사명
+SELECT b.bookname, b.bookauthor, p.pubname
+FROM book b
+JOIN publisher p ON b.pubno = p.pubno
+WHERE p.pubname = '서울 출판사';
 
+-- 3) '정보출판사'에서 출간된 도서 중 "판매된" 도서의 도서명 (중복 1회만)
+SELECT DISTINCT b.bookname
+FROM book b
+JOIN publisher p ON b.pubno = p.pubno
+JOIN booksale s ON s.bookno = b.bookno
+WHERE p.pubname = '정보출판사';
 
+-- 4) 도서가격이 30,000원 이상인 도서를 주문한 고객: 고객명, 도서명, 도서가격, 주문수량
+SELECT c.clientname, b.bookname, b.bookprice, s.bsqty
+FROM booksale s
+JOIN book b     ON b.bookno = s.bookno
+JOIN client c   ON c.clientno = s.clientno
+WHERE b.bookprice >= 30000;
+
+-- 5) '안드로이드 프로그래밍'을 구매한 고객: 도서명, 고객명, 성별, 주소 (고객명 오름차순)
+SELECT b.bookname, c.clientname, c.clientgender, c.clientaddress
+FROM booksale s
+JOIN book b   ON b.bookno = s.bookno
+JOIN client c ON c.clientno = s.clientno
+WHERE b.bookname = '안드로이드 프로그래밍'
+ORDER BY c.clientname ASC;
+
+-- 6) '도서출판 강남'에서 출간된 도서 중 판매된 도서의 총 매출액
+-- (매출액 = 가격 * 수량)
+SELECT SUM(b.bookprice * s.bsqty) AS 총매출액
+FROM booksale s
+JOIN book b       ON b.bookno = s.bookno
+JOIN publisher p  ON p.pubno = b.pubno
+WHERE p.pubname = '도서출판 강남';
 
 
 
