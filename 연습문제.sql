@@ -173,8 +173,51 @@ WHERE p.pubname = '도서출판 강남';
 
 
 
+--------------------------------------------------------------------------------
+-- 8월 12일 실습
 
-
+-- 1.호날두(고객명)가 주문한 도서의 총 구매량 출력
+SELECT SUM(bsqty) AS 총구매량
+FROM booksale
+WHERE clientno = (
+    SELECT clientno
+    FROM client
+    WHERE clientname = '호날두'
+);
+-- 2.‘정보출판사’에서 출간한 도서를 구매한 적이 있는 고객명 출력
+SELECT DISTINCT c.clientname
+FROM client c
+JOIN booksale s ON c.clientno = s.clientno
+WHERE s.bookno IN (
+    SELECT bookno
+    FROM book
+    WHERE pubno = (
+        SELECT pubno
+        FROM publisher
+        WHERE pubname = '정보출판사'
+    )
+);
+-- 3.베컴이 주문한 도서의 최고 주문수량 보다 더 많은 도서를 구매한 고객명 출력
+SELECT DISTINCT c.clientname
+FROM client c
+JOIN booksale s ON c.clientno = s.clientno
+WHERE s.bsqty > (
+    SELECT MAX(bsqty)
+    FROM booksale
+    WHERE clientno = (
+        SELECT clientno
+        FROM client
+        WHERE clientname = '베컴'
+    )
+);
+-- 4.천안에 거주하는 고객에게 판매한 도서의 총 판매량 출력
+SELECT SUM(bsqty) AS 총판매량
+FROM booksale
+WHERE clientno IN (
+    SELECT clientno
+    FROM client
+    WHERE clientaddress = '천안'
+);
 
 
 
